@@ -1,0 +1,35 @@
+
+    <%- include ("header") %>
+
+
+
+
+        
+    <form method="POST" action="/add" id="add_course">
+        <div class="mb-3">
+          <label for="name" class="form-label">Course name</label>
+          <input type="text" name="name" class="form-control" id="courseName" value="" required>
+        </div>
+        <div class="mb-3">
+          <label for="duration" class="form-label">Duration</label>
+          <input type="text" name="duration" class="form-control" id="duration" value="" required>
+        </div>
+        <div class="mb-3">
+            <label for="fees" class="form-label">Fees</label>
+            <input type="text" name="fees" class="form-control" id="fees" value="" required>
+        </div>
+        <input type="submit" class="btn btn-primary" value="Submit">
+
+    </form>
+
+
+      
+</div>     
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="/js/script.js"></script>
+    <%- include ("footer") %>
+
+</body>
+
+</html>
