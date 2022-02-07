@@ -15,7 +15,6 @@ sequelize.authenticate()
 });
 
 
-sequelize
-  .sync();
+sequelize.sync();
 
 module.exports = { sequelize };

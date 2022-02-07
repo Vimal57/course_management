@@ -8,8 +8,9 @@ const path = require("path");
 
 app.set("view engine", 'ejs');
 app.use(express.static("course_management"));
-app.use("/js", express.static(path.resolve(__dirname, "assets/js")));
+app.use(bodyParser.urlencoded({extended : false}));
 app.use(bodyParser.json());
+app.use("/js", express.static(path.resolve(__dirname, "assets/js")));
 app.use("/", route);
 
 app.listen(port, () => {

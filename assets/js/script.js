@@ -4,8 +4,6 @@ $("#add_course").on("submit", function(event){
 });
 
 
-
-
 $("#update_course").on("submit", function(event){
     event.preventDefault();
     
@@ -16,17 +14,11 @@ $("#update_course").on("submit", function(event){
         data[n['name']] = n['value']
     });
 
-    // JSON.parse(obj);
-
-    alert(`type is ${data.fees + 5}`)
-
     var request = {
         "url" : `http://localhost:3000/update/${data.id}`,
         "method" : "PATCH",
         "data" : data
     };
-
-    alert(`Course updated successfully!`);
 
     $.ajax(request).done(function(response){
         alert("Data Updated Successfully!");

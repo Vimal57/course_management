@@ -1,13 +1,20 @@
-const { json } = require("body-parser");
 const Course = require("../models/course");
-const axios = require("axios");
+const validator = require("validator");
 
 
-// get course on homepage
-async function getAllCoursesGet(req, res) {
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res
+ * @description "For get all the details at homepage" 
+ * @author "Vimal Solanki (zignuts technolabs)"
+ */
+async function getAllCourses(req, res) {
     try {
+        // find all courses
         let data = await Course.findAll();
 
+        // if there is no data
         if(data) {
             res.render("index.ejs", { data : data });
         } else {
@@ -22,9 +29,17 @@ async function getAllCoursesGet(req, res) {
     }
 };
 
-// provide form of addCourse page
-async function addCourseGet(req, res) {
+
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res
+ * @description "provide form of addCourse page" 
+ * @author "Vimal Solanki (zignuts technolabs)"
+ */
+async function renderAddCourse(req, res) {
     try {
+        // render page of add course
         res.render("addCourse.ejs");
     } catch(err) {
         res.status(400).send({
@@ -34,27 +49,39 @@ async function addCourseGet(req, res) {
     }
 };
 
-// add new courses from addCourse page
+
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res
+ * @description "add new courses from addCourse page" 
+ * @author "Vimal Solanki (zignuts technolabs)"
+ */
 async function addCourse(req, res) {
     try {
-        let obj = JSON.parse(JSON.stringify(req.body));
+        // destructure data
+        let { name, duration, fees } = req.body;
 
-        if(Object.keys(req.body).length == 0) {
-            res.status(400).send({
-                msg : "Content can not be empty!"
-            });
+        // function for check that given value is integer or not
+        function isNumber(n) { return !isNaN(parseFloat(n)) && !isNaN(n - 0) };
+
+        // values with correct datatype
+        if(typeof(name) == "string" && isNumber(duration) && isNumber(fees)) {
+            const newCourse = {
+                name : name,
+                duration : duration,
+                fees : fees
+            };
+            
+            await Course.create(newCourse);
+
+            const data = await Course.findAll();
+            res.status(200).render("index.ejs", { data : data });
+
+        // value with incorrect datatype    
+        } else {
+            res.status(400).send("Please enter valid data!")
         }
-
-        const newCourse = {
-            name : obj.name,
-            duration : obj.duration,
-            fees : obj.fees
-        };
-
-        await Course.create(newCourse);
-        
-        res.status(200).render("addCourse.ejs")
-
 
     } catch(err) {
         console.log("err : ", err);
@@ -65,11 +92,19 @@ async function addCourse(req, res) {
     } 
 };
 
-// provide form of updateCourse
-async function updateCourseGet(req, res) {
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res
+ * @description "provide form of updateCourse" 
+ * @author "Vimal Solanki (zignuts technolabs)"
+ */
+async function renderUpdateCourse(req, res) {
     try {
+        // check given data is available or not in database
         let course = await Course.findOne({ where : { id : req.query.id }});
-
+        
+        // give  page of update course
         if(course) {
             res.render("update.ejs", { course : course });
         } else {
@@ -85,38 +120,61 @@ async function updateCourseGet(req, res) {
 
 };
 
-// for update data 
+
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res
+ * @description "for update data " 
+ * @author "Vimal Solanki (zignuts technolabs)"
+ */
 async function updateCourse(req, res) {
     try {
+        // object destructuring
+        let { name, duration, fees } = req.body;
+        let course = { name, duration, fees };
 
-        if (!req.body) {
-            return res.status(400).send({
-                msg : "Data to update can not be empty"
-            })
-        };
+        // function for check is given value is number or not
+        function isNumber(n) { return !isNaN(parseFloat(n)) && !isNaN(n - 0) };
 
-        let data = await Course.findOne({ where : 
-            { 
-                id : req.body.id 
-            }
-        });
+        // if values are with correct datatype
+        if(typeof(name) == "string" && isNumber(duration) && isNumber(fees)) {
 
-        if (data) {
-            await Course.update({
-                name : req.body.name,
-                duration : req.body.duration,
-                fees : req.body.fees
-            }, { where : { id : req.body.id }});
+            console.log(typeof(name));
+            console.log(typeof(duration));
+            console.log(typeof(fees));
 
-            res.redirect("/");
-
-        } else {
-            res.status(200).send({
-                status : "fail",
-                msg : "Error In Updating Course Information!",
-                data : data
+            let data = await Course.findOne({ where : 
+                { 
+                    id : req.body.id 
+                }
             });
+    
+            if (data) {
+                await Course.update({
+                    name : req.body.name,
+                    duration : req.body.duration,
+                    fees : req.body.fees
+                }, { where : { id : req.body.id }});
+
+                const data = await Course.findAll();
+                res.status(200).render("index.ejs", { data : data });
+    
+            } else {
+                res.status(200).send({
+                    status : "fail",
+                    msg : "Error In Updating Course Information!",
+                    data : data
+                });
+            }    
+
+        // if datatype of value is not correct    
+        } else {
+            console.log("###############################################******");
+            res.send("Enter valid data!");
+            res.render('update.ejs', { course : course });
         }
+        
 
     } catch (err) {
         res.status(400).send({
@@ -127,16 +185,25 @@ async function updateCourse(req, res) {
     
 };
 
-// for delete data
+
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res
+ * @description "for delete data " 
+ * @author "Vimal Solanki (zignuts technolabs)"
+ */
 async function deleteCourse(req, res) {
     try {
-        console.log("req.params : ", req.params);
-        
+        // check selected data is available or not in database        
         let data = await Course.findOne({ where : { id : req.params.id }});
+
+        // if data is available in database
         if (data) {
             let data = await Course.destroy({ where : { id : req.params.id }});
             res.redirect("/");
 
+        // if data is not available in database    
         } else {
             res.status(200).send({
                 status : "success",
@@ -155,4 +222,11 @@ async function deleteCourse(req, res) {
 
 
 
-module.exports = { getAllCoursesGet, updateCourseGet, addCourseGet, addCourse, updateCourse, deleteCourse };
+module.exports = { 
+    getAllCourses,
+    renderUpdateCourse, 
+    renderAddCourse, 
+    addCourse, 
+    updateCourse, 
+    deleteCourse 
+};
