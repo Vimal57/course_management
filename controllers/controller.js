@@ -38,7 +38,7 @@ async function getAllCourses(req, res) {
 async function renderAddCourse(req, res) {
     try {
         // render page of add course
-        res.render("addCourse.ejs");
+        res.render("addCourse.ejs", { msg : "success" });
     } catch(err) {
         res.status(400).send({
             status : "fail",
@@ -73,13 +73,13 @@ async function addCourse(req, res) {
             
             await Course.create(newCourse);
 
-            res.redirect("/");
-            // const data = await Course.findAll();
-            // res.status(200).render("index.ejs", { data : data });
+            const data = await Course.findAll();
+            res.status(200).render("index.ejs", { data : data, msg : "success" });
 
         // value with incorrect datatype    
         } else {
-            res.status(400).send("Please enter valid data!")
+            res.status(200).render("addCourse.ejs", { data : req.body, msg : "err" });
+
         }
 
     } catch(err) {
@@ -105,7 +105,7 @@ async function renderUpdateCourse(req, res) {
         
         // give  page of update course
         if(course) {
-            res.render("update.ejs", { course : course });
+            res.render("update.ejs", { course : course, msg : 'success' });
         } else {
             res.send("Something went wrong!");
         }
@@ -137,7 +137,6 @@ async function renderUpdateCourse(req, res) {
 		
         // object destructuring
         let { id, name, duration, fees } = req.body;
-        console.log("id : ", id);
 
         // function for check is given value is number or not
         function isNumber(n) { return !isNaN(parseFloat(n)) && !isNaN(n - 0) };
@@ -172,9 +171,7 @@ async function renderUpdateCourse(req, res) {
 
         // if datatype of value is not correct    
         } else {
-            console.log("###############################################******");
-            res.send("Enter valid data!");
-            // res.render('update.ejs', { course : course });
+            res.render('update.ejs', { course : req.body, msg : "err" });
         }
         
 

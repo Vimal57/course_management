@@ -12,7 +12,7 @@ router.post("/add", controller.addCourse);
 
 router.get("/update", controller.renderUpdateCourse);
 
-router.patch("/update/:id", controller.updateCourse);
+router.post("/update", controller.updateCourse);
 
 router.get("/:id", controller.deleteCourse);
 
