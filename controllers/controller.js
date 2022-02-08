@@ -1,6 +1,4 @@
 const Course = require("../models/course");
-const validator = require("validator");
-
 
 /**
  * 
@@ -75,8 +73,9 @@ async function addCourse(req, res) {
             
             await Course.create(newCourse);
 
-            const data = await Course.findAll();
-            res.status(200).render("index.ejs", { data : data });
+            res.redirect("/");
+            // const data = await Course.findAll();
+            // res.status(200).render("index.ejs", { data : data });
 
         // value with incorrect datatype    
         } else {
@@ -128,11 +127,17 @@ async function renderUpdateCourse(req, res) {
  * @description "for update data " 
  * @author "Vimal Solanki (zignuts technolabs)"
  */
-async function updateCourse(req, res) {
+ async function updateCourse(req, res) {
     try {
+		if (!req.body) {
+            return res.status(400).send({
+                msg : "Data to update can not be empty"
+            })
+        };
+		
         // object destructuring
-        let { name, duration, fees } = req.body;
-        let course = { name, duration, fees };
+        let { id, name, duration, fees } = req.body;
+        console.log("id : ", id);
 
         // function for check is given value is number or not
         function isNumber(n) { return !isNaN(parseFloat(n)) && !isNaN(n - 0) };
@@ -140,25 +145,22 @@ async function updateCourse(req, res) {
         // if values are with correct datatype
         if(typeof(name) == "string" && isNumber(duration) && isNumber(fees)) {
 
-            console.log(typeof(name));
-            console.log(typeof(duration));
-            console.log(typeof(fees));
-
             let data = await Course.findOne({ where : 
                 { 
-                    id : req.body.id 
+                    id : id 
                 }
             });
     
             if (data) {
                 await Course.update({
-                    name : req.body.name,
-                    duration : req.body.duration,
-                    fees : req.body.fees
-                }, { where : { id : req.body.id }});
+                    name : name,
+                    duration : duration,
+                    fees : fees
+                }, { where : { id : id }});
 
-                const data = await Course.findAll();
-                res.status(200).render("index.ejs", { data : data });
+                // res.redirect("/");
+                let courses = await Course.findAll();
+                res.render("index", { data : courses });
     
             } else {
                 res.status(200).send({
@@ -172,7 +174,7 @@ async function updateCourse(req, res) {
         } else {
             console.log("###############################################******");
             res.send("Enter valid data!");
-            res.render('update.ejs', { course : course });
+            // res.render('update.ejs', { course : course });
         }
         
 
@@ -184,7 +186,6 @@ async function updateCourse(req, res) {
     }
     
 };
-
 
 /**
  * 

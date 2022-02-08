@@ -1,3 +1,17 @@
+
+
+
+$.ajax(request).done(function(response){
+    alert("Please Enter Valid Data!");
+});
+
+window.location.href = "http://localhost:3000/";
+
+
+
+
+
+
 function getParameter(parameterName) {
     let parameter = new URLSearchParams( window.location.search );
     return parameter.get( parameterName );

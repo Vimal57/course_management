@@ -4,6 +4,7 @@ $("#add_course").on("submit", function(event){
 });
 
 
+
 $("#update_course").on("submit", function(event){
     event.preventDefault();
     
